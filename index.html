@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>wedding</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000000; /* Спокойный бежевый фон */
+      color: #000; /* Цвет текста черный для контраста */
+      font-family: sans-serif;
+      scroll-behavior: smooth;
+    }
+    .video-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    video {
+      width: 100vw; /* Ширина видео на весь экран */
+      height: 100vh; /* Высота видео на весь экран */
+      object-fit: cover; /* Видео будет растягиваться, чтобы покрыть экран */
+      background: #000; /* Фон черный для предотвращения черных участков */
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="video-card">
+      <video id="v0" src="https://raw.githubusercontent.com/yat0mmy/weddinglizanikita2/main/videos/video1.mp4" preload="auto" muted playsinline></video>
+    </section>
+    <section class="video-card">
+      <video id="v1" src="https://raw.githubusercontent.com/yat0mmy/weddinglizanikita2/main/videos/video2.mp4" preload="auto" muted playsinline></video>
+    </section>
+    <section class="video-card">
+      <video id="v2" src="https://raw.githubusercontent.com/yat0mmy/weddinglizanikita2/main/videos/video4.mp4" preload="auto" muted playsinline></video>
+    </section>
+    <section class="video-card">
+      <video id="v3" src="https://raw.githubusercontent.com/yat0mmy/weddinglizanikita2/main/videos/video3.mp4" preload="auto" muted playsinline></video>
+    </section>
+  </main>
+
+  <script>
+    const videos = [
+      document.getElementById('v0'),
+      document.getElementById('v1'),
+      document.getElementById('v2'),
+      document.getElementById('v3')
+    ];
+
+    // Предзагружаем все видео
+    videos.forEach(video => {
+      video.load();
+    });
+
+    async function playSequentially(index = 0) {
+      if (index >= videos.length) return;
+      const video = videos[index];
+
+      // Дожидаемся, когда видео будет готово к воспроизведению
+      await new Promise(resolve => {
+        video.addEventListener('canplaythrough', resolve, { once: true });
+      });
+
+      // Пытаемся воспроизвести видео
+      try {
+        await video.play();
+      } catch (err) {
+        video.muted = true;
+        try {
+          await video.play();
+        } catch {}
+      }
+
+      video.addEventListener('ended', () => {
+        video.pause();
+        if (index + 1 < videos.length) {
+          // Переключаемся на следующее видео и прокручиваем страницу вниз
+          videos[index + 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setTimeout(() => playSequentially(index + 1), 600);
+        }
+      }, { once: true });
+    }
+
+    window.addEventListener('load', () => {
+      playSequentially(0);
+    });
+  </script>
+</body>
+</html>
